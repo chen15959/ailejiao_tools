@@ -2,7 +2,7 @@ import json
 import io
 import os
 import os.path
-from src.myhttp import login, get, APP_SERVER
+from src.myhttp import login, get, download, APP_SERVER
 
 
 class ClassCirclePicture(object):
@@ -11,12 +11,23 @@ class ClassCirclePicture(object):
     _thumbnail = ''
     _normal = ''
     _original = ''
+    _type = ''
 
     def __init__(self, jo, ccid):
         self._cc = ccid
         self._id = jo['id']
         self._thumbnail = jo['thumbnailUrl']
         self._normal = jo['url']
+        fnp = jo['fileName'].split('.')
+        self._type = fnp[len(fnp) - 1]
+
+    def download(self, folder):
+        download(self._thumbnail, os.path.join(folder, "%d_thrmbnail.%s" % (self._id, self._type)))
+        download(self._normal, os.path.join(folder, "%d.%s" % (self._id, self._type)))
+        jo = get('%s/class_circle_messages/%d/oss_resources/%d/origin_resource?platform=app' % (APP_SERVER, self._cc, self._id))
+        self._original = jo['ossResourceUrl']
+        
+
 
 
 
@@ -41,7 +52,26 @@ class ClassCircle(object):
 
 
     def download(self, folder):
-        t = os.access(os.path.join(folder, self._name))
+        datadir = os.path.join(folder, self._name)
+        if os.access(datadir, os.F_OK):
+            return False;
+        else:
+            tempdir = os.path.join(folder, self._id)
+            if os.access(tempdir, os.F_OK):
+                os.rmdir(tempdir)
+
+            os.mkdir(tempdir)
+
+            with open(os.path.join(tempdir, 'content.txt'), 'w') as fp:
+                fp.write(self._text)
+
+            for picture in self._pictures:
+                picture.download(tempdir)
+
+            os.rename(tempdir, datadir)
+
+
+
 
 
 
