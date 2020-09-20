@@ -130,7 +130,7 @@ def process_class_circle(folder, jo):
 
         os.mkdir(tempdir)
 
-        with open(os.path.join(tempdir, 'content.txt'), 'w') as fp:
+        with open(os.path.join(tempdir, 'content.txt'), 'w', encoding='utf8') as fp:
             text = jo['content']
             fp.write(text)
 
