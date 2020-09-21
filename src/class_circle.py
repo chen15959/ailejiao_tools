@@ -3,6 +3,7 @@ import io
 import os
 import os.path
 from myhttp import prepare, get, download, APP_SERVER
+import shutil
 
 
 # class ClassCirclePicture(object):
@@ -102,10 +103,14 @@ def process_picture(folder, ccid, jo):
 
     if True:
         try:
-            jo = get('%s/class_circle_messages/%d/oss_resources/%d/origin_resource?platform=app' % (APP_SERVER, ccid, id))
-            download(jo['ossResourceUrl'], os.path.join(folder, "%d.%s" % (id, type)))
+            jo1 = get('%s/class_circle_messages/%d/oss_resources/%d/origin_resource?platform=app' % (APP_SERVER, ccid, id))
+
+            with open(os.path.join(folder, '%d.json' % id), 'w') as fp:
+                json.dump(jo1, fp)
+
+            download(jo1['ossResourceUrl'], os.path.join(folder, "%d.%s" % (id, type)))
         except:
-            download(jo['url']._normal, os.path.join(folder, "%d_normal.%s" % (id, type)))
+            download(jo['url'], os.path.join(folder, "%d_normal.%s" % (id, type)))
     else:
         print("ccid=%d, pid=%d" % (ccid, id))
 
@@ -117,7 +122,7 @@ def process_class_circle(folder, jo):
     time = jo['createTime'].replace(' ', '_').replace(':', '-')
     name = "%d_%s" % (id, time)
 
-    print('process class circle [%d]' % id, end='')
+    print('process class circle [%d] (%s)' % (id, time))
 
     datadir = os.path.join(folder, name)
     if os.access(datadir, os.F_OK):
@@ -126,7 +131,8 @@ def process_class_circle(folder, jo):
     else:
         tempdir = os.path.join(folder, str(id))
         if os.access(tempdir, os.F_OK):
-            os.rmdir(tempdir)
+            shutil.rmtree(tempdir)
+            #os.rmdir(tempdir)
 
         os.mkdir(tempdir)
 
@@ -140,7 +146,7 @@ def process_class_circle(folder, jo):
 
         os.rename(tempdir, datadir)
 
-        print(' done')
+        print('class circle [%d] done' % id)
 
 
 

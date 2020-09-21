@@ -3,6 +3,7 @@
 import requests
 import threading
 import json
+import urllib3
 
 #from config import Config
 #from config import load_config, save_config, is_ready, set_token, get_login_header, get_normal_header, get_user, get_password
@@ -68,23 +69,45 @@ def verify():
 
 
 def get(url):
-    r = requests.get(url = url, headers = Config().get_header(), verify = False)
-    return get_data(r)
+    for i in range(1,5):
+        try:
+            r = requests.get(url = url, headers = Config().get_header(), verify = False, timeout=120)
+            return get_data(r)
+        except requests.exceptions.ConnectTimeout:
+            pass
+        except requests.exceptions.ReadTimeout:
+            pass
+        except requests.exceptions.Timeout:
+            pass
+
+    raise requests.exceptions.Timeout
 
 
 
 def download(url, filename):
-    r = requests.get(url = url, headers = Config().get_header(), verify = False)
-    if (r.status_code == 200):
-        f = open(filename, "wb")
-        f.write(r.content)
-        f.close()
-        return True
-    else:
-        return False
+    for i in range(1,5):
+        try:
+            r = requests.get(url = url, headers = Config().get_header(), verify = False, timeout=120)
+            if (r.status_code == 200):
+                f = open(filename, "wb")
+                f.write(r.content)
+                f.close()
+                return True
+            else:
+                return False
+        except requests.exceptions.ConnectTimeout:
+            pass
+        except requests.exceptions.ReadTimeout:
+            pass
+        except requests.exceptions.Timeout:
+            pass
+
+    raise requests.exceptions.Timeout
 
 
 def prepare():
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     #load_config('config.ini')
     Config().load('config.ini')
 
