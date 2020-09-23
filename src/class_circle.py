@@ -4,94 +4,9 @@ import os
 import os.path
 from myhttp import prepare, get, download, APP_SERVER
 import shutil
+from config import Config
 
 
-# class ClassCirclePicture(object):
-#     _id = -1
-#     _cc = -1
-#     _thumbnail = ''
-#     _normal = ''
-#     _original = ''
-#     _type = ''
-#
-#     def __init__(self, jo, ccid):
-#         self._cc = ccid
-#         self._id = jo['id']
-#         self._thumbnail = jo['thumbnailUrl']
-#         self._normal = jo['url']
-#         fnp = jo['fileName'].split('.')
-#         self._type = fnp[len(fnp) - 1]
-#
-#     def download(self, folder):
-#         try:
-#             jo = get('%s/class_circle_messages/%d/oss_resources/%d/origin_resource?platform=app' % (APP_SERVER, self._cc, self._id))
-#             download(jo['ossResourceUrl'], os.path.join(folder, "%d_original.%s" % (self._id, self._type)))
-#         except:
-#             try:
-#                 download(self._normal, os.path.join(folder, "%d.%s" % (self._id, self._type)))
-#             except:
-#                 try:
-#                     download(self._thumbnail, os.path.join(folder, "%d_thrmbnail.%s" % (self._id, self._type)))
-#                 except:
-#                     with open(os.path.join(folder, "%d_placeholder.txt" % self._id)) as fp:
-#                         fp.write("can not download")
-#
-#
-#
-#
-#
-#
-#
-# #
-# class ClassCircle(object):
-#     _id = -1
-#     _pictures = []
-#     _text = ""
-#     _time = ""
-#     _name = ""
-#
-#     def __init__(self, jo):
-#         self._id = jo['id']
-#         self._text = jo['content']
-#         self._time = jo['createTime'].replace(' ', '_').replace(':', '-')
-#
-#         self._name = "%d_%s" % (self._id, self._time)
-#
-#         for picture in jo['ossResources']:
-#             self._pictures.append(ClassCirclePicture(picture, self._id))
-#
-#
-#     def download(self, folder):
-#         datadir = os.path.join(folder, self._name)
-#         if os.access(datadir, os.F_OK):
-#             return False;
-#         else:
-#             tempdir = os.path.join(folder, self._id)
-#             if os.access(tempdir, os.F_OK):
-#                 os.rmdir(tempdir)
-#
-#             os.mkdir(tempdir)
-#
-#             with open(os.path.join(tempdir, 'content.txt'), 'w') as fp:
-#                 fp.write(self._text)
-#
-#             for picture in self._pictures:
-#                 picture.download(tempdir)
-#
-#             os.rename(tempdir, datadir)
-#
-#
-
-
-
-
-
-# def build_from_json(jo):
-#     ret = []
-#     for jcc in jo['items']:
-#         ret.append(ClassCircle(jcc))
-#
-#     return ret
 
 
 def process_picture(folder, ccid, jo):
@@ -105,8 +20,9 @@ def process_picture(folder, ccid, jo):
         try:
             jo1 = get('%s/class_circle_messages/%d/oss_resources/%d/origin_resource?platform=app' % (APP_SERVER, ccid, id))
 
-            with open(os.path.join(folder, '%d.json' % id), 'w') as fp:
-                json.dump(jo1, fp)
+            if Config().debug:
+                with open(os.path.join(folder, '%d.json' % id), 'w') as fp:
+                    json.dump(jo1, fp)
 
             download(jo1['ossResourceUrl'], os.path.join(folder, "%d.%s" % (id, type)))
         except:
@@ -127,6 +43,7 @@ def process_class_circle(folder, jo):
     datadir = os.path.join(folder, name)
     if os.access(datadir, os.F_OK):
         #TODO 是否会存在内容被zQWTY4
+        print('already done')
         return False;
     else:
         tempdir = os.path.join(folder, str(id))
