@@ -24,9 +24,10 @@ class Config(object):
     def load(self, filename):
         with open(filename, 'r') as fp:
             for line in fp.readlines():
-                parts = line.rstrip('\n').split('=', maxsplit=1)
-                if len(parts) == 2:
-                    self.data[parts[0].strip(' ')] = parts[1].strip(' ')
+                if not line.startswith('#'):
+                    parts = line.rstrip('\n').split('=', maxsplit=1)
+                    if len(parts) == 2:
+                        self.data[parts[0].strip(' ')] = parts[1].strip(' ')
 
     def save(self, filename):
         with open(filename, 'w') as fp:
@@ -44,6 +45,9 @@ class Config(object):
 
     def set_token(self, token):
         self.data['token'] = token
+
+    def set_user(self, userid):
+        self.data['userid'] = userid
 
 
     def get_header(self):
