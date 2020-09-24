@@ -30,13 +30,17 @@ def login():
     r = requests.post(url = APP_SERVER + "/token/login", data = form, headers = {"appid" : "easyteaching_app", "Content-Type" : "application/x-www-form-urlencoded"}, verify = False)
     jr = get_data(r)
     Config().set_token(jr['token'])
+    Config().set_user(jr['id'])
+
 
 
 def verify():
     try:
         get(APP_SERVER + "/token/work_count?platform=app")
+        return True
     except:
         Config().set_token('')
+        return False
 
 
 
@@ -54,6 +58,21 @@ def get(url):
 
     raise requests.exceptions.Timeout
 
+
+
+def post(url, data):
+    for i in range(1,5):
+        try:
+            r = requests.post(url = url, data = data, headers = Config().get_header(), verify = False, timeout=30)
+            return get_data(r)
+        except requests.exceptions.ConnectTimeout:
+            pass
+        except requests.exceptions.ReadTimeout:
+            pass
+        except requests.exceptions.Timeout:
+            pass
+
+    raise requests.exceptions.Timeout
 
 
 def download(url, filename):
@@ -80,18 +99,25 @@ def download(url, filename):
 def prepare():
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-    #load_config('config.ini')
     Config().load('config.ini')
 
-    while not Config().is_ready():
+    if Config().is_ready():
+        if verify():
+            return True
+
+
+    for i in range(1, 5):
         try:
             login()
+            break
         except:
-            pass
+            if i > 5:
+                break
 
-    verify()
 
-    if Config().is_ready():
+
+
+    if verify():
         Config().save('config.ini')
         return True
     else:
