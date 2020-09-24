@@ -2,7 +2,7 @@ import json
 import io
 import os
 import os.path
-from myhttp import prepare, get, download, APP_SERVER
+from myhttp import prepare, get, download, APP_SERVER, post
 import shutil
 from config import Config
 
@@ -67,6 +67,22 @@ def process_class_circle(folder, jo):
 
 
 
+def praise_class_circle(jo):
+    for comment in jo['comments']:
+        if comment['createUserId'] == Config().get('userid'):
+            return
+
+    id = jo['id']
+    print('praise class circle [%d] (%s) ...' % (id, jo['createTime']), end='')
+
+    url = APP_SERVER + '/class_circle_messages/%d/comments?objJsonStr=#7B#22createUserId#22#3A%d#2c#22isPraised#22#3Atrue#7D&platform=app' % (id, Config.get('userid'))
+    url.replace('#', '%')
+
+    #post(url, data='')
+    print(url)
+
+    print(' done')
+
 
 
 if __name__ == '__main__':
@@ -74,10 +90,13 @@ if __name__ == '__main__':
 #    login('13761240204', '123')
 #    r = get(APP_SERVER + "/class_circle_messages/?currentPage=1&pageSize=1000&platform=app")
 #    items = r['item']
-    with open('D:/work/ailejiao_clone/test/banjiquan.json', 'r', encoding='utf8') as fp:
+    Config().load('config.ini')
+
+    with open('test/banjiquan.json', 'r', encoding='utf8') as fp:
         j = json.load(fp)
         for item in j['data']['items']:
-            process_class_circle("d:/work/ailejiao_clone/test/", item)
+            #process_class_circle("test/", item)
+            praise_class_circle(item)
 
 
 
