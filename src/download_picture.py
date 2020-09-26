@@ -6,8 +6,9 @@ import os
 from datetime import datetime
 
 
-
+print('login to server ... ', end='')
 if prepare():
+    print(' done')
     print('download class circle data ...', end='')
     r = get(APP_SERVER + "/class_circle_messages/?currentPage=1&pageSize=1000&platform=app")
     print(' done')
@@ -20,3 +21,5 @@ if prepare():
         process_class_circle(Config().get('download_folder'), item)
 
     print('all done')
+else:
+    print(' failed')
