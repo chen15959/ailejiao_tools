@@ -36,11 +36,14 @@ class Config(object):
 
 
     def get(self, key):
-        return self.data[key]
+        if key in self.data:
+            return self.data[key]
+        else:
+            return ''
 
 
     def is_ready(self):
-        return self.data['token'] != ''
+        return self.get('token') != ''
 
 
     def set_token(self, token):
