@@ -7,7 +7,9 @@ from datetime import datetime
 
 
 
+print('login to server ... ', end='')
 if prepare():
+    print(' done')
     print('download class circle data ...', end='')
     r = get(APP_SERVER + "/class_circle_messages/?currentPage=1&pageSize=1000&platform=app")
     print(' done')
@@ -20,3 +22,5 @@ if prepare():
         praise_class_circle(item)
 
     print('all done')
+else:
+    print(' failed')

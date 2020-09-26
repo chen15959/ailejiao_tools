@@ -69,17 +69,17 @@ def process_class_circle(folder, jo):
 
 def praise_class_circle(jo):
     for comment in jo['comments']:
-        if comment['createUserId'] == Config().get('userid'):
+        if str(comment['createUserId']) == Config().get('userid'):
             return
 
-    id = jo['id']
-    print('praise class circle [%d] (%s) ...' % (id, jo['createTime']), end='')
+    ccid = jo['id']
+    print('praise class circle [%d] (%s) ...' % (ccid, jo['createTime']), end='')
 
-    url = APP_SERVER + '/class_circle_messages/%d/comments?objJsonStr=#7B#22createUserId#22#3A%d#2c#22isPraised#22#3Atrue#7D&platform=app' % (id, Config.get('userid'))
-    url.replace('#', '%')
+    url = APP_SERVER + '/class_circle_messages/%d/comments?objJsonStr=#7B#22createUserId#22#3A%s#2c#22isPraised#22#3Atrue#7D&platform=app' % (ccid, Config().get('userid'))
+    url = url.replace('#', '%')
 
-    #post(url, data='')
-    print(url)
+    post(url, data='')
+    #print(url)
 
     print(' done')
 
