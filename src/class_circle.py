@@ -53,13 +53,15 @@ def process_class_circle(folder, jo):
 
         os.mkdir(tempdir)
 
+        # 下载图片
+        for picture in jo['ossResources']:
+            process_picture(tempdir, id, picture)
+
+        # 下载文字
         with open(os.path.join(tempdir, 'content.txt'), 'w', encoding='utf8') as fp:
             text = jo['content']
             fp.write(text)
 
-
-        for picture in jo['ossResources']:
-            process_picture(tempdir, id, picture)
 
         os.rename(tempdir, datadir)
 
