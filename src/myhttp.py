@@ -25,6 +25,12 @@ def get_data(response):
 
 
 # 用户登录 获得token
+#  v3.20.4 发送的password加密了
+#  是一个base64的字符串
+#  但是这个字符串解压之后是一个未知的16字节二进制
+#  怀疑是密码加盐之后的md5
+#  相同密码 这个二进制不变
+#  所以现在只能在config.txt里指定token项了
 def login():
     form = "password=%s&phone=%s&platform=app" % (Config().get('password'), Config().get('user'))
     r = requests.post(url = APP_SERVER + "/token/login", data = form, headers = {"appid" : "easyteaching_app", "Content-Type" : "application/x-www-form-urlencoded"}, verify = False)
@@ -47,7 +53,7 @@ def verify():
 def get(url):
     for i in range(1,5):
         try:
-            r = requests.get(url = url, headers = Config().get_header(), verify = False, timeout=30)
+            r = requests.get(url = url, headers = Config().get_header(), verify = False, timeout=300)
             return get_data(r)
         except requests.exceptions.ConnectTimeout:
             pass
@@ -99,7 +105,7 @@ def download(url, filename):
 def prepare():
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-    Config().load('config.ini')
+    Config().load('../config.ini')
 
     if Config().is_ready():
         if verify():
