@@ -43,48 +43,23 @@ class DownloadWorker(threading.Thread):
                 break
 
 
-def download_worker(todo: Queue):
-    while True:
-        item = todo.get()
-        download_function(item[0], item[1])
-        if item is None:
-            break
 
 
 # 在另外线程中运行的下载管理
-#class Downloader(threading.Thread):
 class Downloader:
 
     def __init__(self, pool_size = 10):
-        #threading.Thread.__init__(self)
-
         self.todo = queue.Queue()
         self.pool_size = pool_size
-
-        #self.stop_after_done = False
 
         self.pool = []
 
     def start(self):
         # 启动工作进程
         for i in range(self.pool_size):
-            #p = Process(target=download_worker, args=self.todo)
-            #p.start()
-            #self.pool[i] = p
             p = DownloadWorker(self.todo)
             p.start()
             self.pool.append(p)
-
-
-
-
-    # 启动下载器
-    def run(self):
-        # 启动工作进程
-        for i in range(self.pool_size):
-            p = Process(target=download_worker, args=self.todo)
-            p.start()
-            self.pool[i] = p
 
 
 
@@ -108,9 +83,6 @@ class Downloader:
 
 
 
-
-    def queue_size(self):
-        return self.todo.qsize()
 
 
 
