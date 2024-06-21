@@ -54,7 +54,7 @@ class Config(object):
 
 
     def get_header(self):
-        return {"appid": "easyteaching_app", "token": self.get('token')}
+        return {"appid": "easyteaching_ios", "token": self.get('token'), "BuildVersion": "326"}
 
 
     def debug(self):
